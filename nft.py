@@ -27,7 +27,8 @@ NFT_ENDPOINT = "https://api.blockchainapi.com/v1/solana/nft"
 
 DERIVATION_PATH = ""
 
-PUBLIC_KEY = "HyRxYQYMfrGmDYcukX6LP9SitHVdLyFU8F8Ryo7Aexjj"
+# PUBLIC_KEY = "HyRxYQYMfrGmDYcukX6LP9SitHVdLyFU8F8Ryo7Aexjj"
+PUBLIC_KEY = "7CjX5NP1KkteFQTYYgGUbr7XutAUpHeDdjo4ymrvyXZa"
 
 
 def get_balance():
@@ -49,32 +50,29 @@ def get_nft_mint_fee():
     print(response.json())
 
 
-# get_balance()
+get_balance()
 # get_nft_mint_fee()
 
-# API Key: dae0963cb3c347ec8d57
-# API Secret: 7e61dfb5c30ff70373b5194b6a404f25a37d23d79ad2b4ac6be57b293eba8229
-# JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJiYjhiNWVkYS00MTNlLTQ0MGMtYTEwNS0wOGEwNTYxMzY3NTkiLCJlbWFpbCI6InRyYWJham9vc2NhcnJpb2phc0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiZGFlMDk2M2NiM2MzNDdlYzhkNTciLCJzY29wZWRLZXlTZWNyZXQiOiI3ZTYxZGZiNWMzMGZmNzAzNzNiNTE5NGI2YTQwNGYyNWEzN2QyM2Q3OWFkMmI0YWM2YmU1N2IyOTNlYmE4MjI5IiwiaWF0IjoxNzA4MjMzNDgxfQ.IhkxULCYkXDB6Z2GiqvJNxpErIVAR0yHfN9pTN-yXcQ
 
-if __name__ == '__main__':
-    # Create the NFT!
-    mint_nft_response = requests.post(
-        NFT_ENDPOINT,
-        params={
-            "derivation_path": DERIVATION_PATH,
-            "secret_recovery_phrase": SECRET_PHRASE,
-            "nft_name": NFT_NAME,
-            "nft_symbol": NFT_SYMBOL,
-            "nft_description": NFT_DESCRIPTION,
-            "nft_url": NFT_URI,
-            "nft_metadata": json.dumps(NFT_METADATA),
-            "network": "devnet",
-            "nft_upload_method": "S3"
-        },
-        headers=HEADERS
-    )
-    response = mint_nft_response.json()
-    print(mint_nft_response.json())
-
-    with open('data.json', 'w') as file:
-        json.dump(response, file, indent=4)
+# if __name__ == '__main__':
+#     # Create the NFT!
+#     mint_nft_response = requests.post(
+#         NFT_ENDPOINT,
+#         params={
+#             "derivation_path": DERIVATION_PATH,
+#             "secret_recovery_phrase": SECRET_PHRASE,
+#             "nft_name": NFT_NAME,
+#             "nft_symbol": NFT_SYMBOL,
+#             "nft_description": NFT_DESCRIPTION,
+#             "nft_url": NFT_URI,
+#             "nft_metadata": json.dumps(NFT_METADATA),
+#             "network": "devnet",
+#             "nft_upload_method": "S3"
+#         },
+#         headers=HEADERS
+#     )
+#     response = mint_nft_response.json()
+#     print(mint_nft_response.json())
+#
+#     with open('data.json', 'w') as file:
+#         json.dump(response, file, indent=4)

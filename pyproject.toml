@@ -7,8 +7,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-solana = "^0.31.0"
-
+solana = "^0.32.0"
+requests = "^2.31.0"
+theblockchainapi = "^0.0.604"
 
 [build-system]
 requires = ["poetry-core"]

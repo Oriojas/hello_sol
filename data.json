@@ -1,0 +1,4 @@
+{
+    "error_code": 1,
+    "error_message": "You have run out of API calls. Here's what you can do. (1) If you authenticated with a wallet, note that to access the FREE tier, you must add a verified email first. Add one here: https://dashboard.blockchainapi.com/profiles/profile. (2) If you already consumed your free tier for the month, upgrade to one of the plans available: https://dashboard.blockchainapi.com#billing. (3) If you believe this was sent in error, contact us: https://blockchainapi.com/contact"
+}

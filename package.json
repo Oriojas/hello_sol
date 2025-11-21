@@ -1,0 +1,40 @@
+{
+  "name": "nft-servicios-acompanamiento",
+  "version": "1.0.0",
+  "description": "NFT Collection para Servicios de Acompañamiento a Adultos Mayores",
+  "main": "hardhat.config.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.js --network arbitrumSepolia",
+    "deploy:local": "hardhat run scripts/deploy.js --network hardhat",
+    "deploy-and-verify": "hardhat run scripts/deploy-and-verify.js --network arbitrumSepolia",
+    "verify": "hardhat run scripts/verify.js --network arbitrumSepolia",
+    "export-abi": "hardhat run scripts/export-abi.js",
+    "setup-uris": "hardhat run scripts/setup-uris.js --network arbitrumSepolia",
+    "create-service": "hardhat run scripts/create-test-service.js --network arbitrumSepolia",
+    "test": "hardhat test",
+    "clean": "hardhat clean",
+    "node:local": "hardhat node"
+  },
+  "keywords": [
+    "NFT",
+    "ERC721",
+    "Solidity",
+    "Hardhat",
+    "Arbitrum",
+    "Web3",
+    "Smart Contracts"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "hardhat": "^2.22.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.5.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.10.0"
+  }
+}

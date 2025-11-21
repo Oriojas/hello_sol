@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-11-21T21:13:46.844Z",
+  "network": "arbitrumSepolia",
+  "chainId": 421614,
+  "deployer": "0xa92d504731aA3E99DF20ffd200ED03F9a55a6219",
+  "contractAddress": "0xFF2E077849546cCB392f9e38B716A40fDC451798",
+  "transactionHash": "0xde54554ac31b7e3de6b62212103aed5c1b293d6ac8335ac4917d2df01f21b161",
+  "blockNumber": 217596257,
+  "gasUsed": "1935642",
+  "gasPrice": "20000000",
+  "contract": {
+    "name": "ColeccionServiciosNFT",
+    "symbol": "CSNFT",
+    "nextTokenId": "0"
+  }
+}

@@ -39,6 +39,8 @@ web3 = Web3(Web3.HTTPProvider(RPC_URL))
 # Validar conexión
 if not web3.is_connected():
     raise ConnectionError("No se pudo conectar a la red Arbitrum")
+else:
+    print(f"🌐 Conectado a Arbitrum Sepolia - Block: {web3.eth.block_number}")
 
 # Cargar ABI desde artifacts de Hardhat
 try:
@@ -70,6 +72,7 @@ if not PRIVATE_KEY:
 
 account = web3.eth.account.from_key(PRIVATE_KEY)
 ACCOUNT_ADDRESS = account.address
+print(f"👤 Cuenta configurada: {ACCOUNT_ADDRESS}")
 
 
 # ==================== MODELOS ====================
@@ -78,7 +81,6 @@ class CrearServicioRequest(BaseModel):
 
 
 class CambiarEstadoRequest(BaseModel):
-    tokenId: int
     nuevoEstado: int
     calificacion: int = 0
 
@@ -97,9 +99,15 @@ class AsignarAcompananteRequest(BaseModel):
 def build_and_send_transaction(function_call):
     """Construye y envía una transacción"""
     try:
+        print(f"🔧 Estimando gas para transacción...")
         nonce = web3.eth.get_transaction_count(ACCOUNT_ADDRESS)
+        print(f"📝 Nonce obtenido: {nonce}")
+
         gas_estimate = function_call.estimate_gas({"from": ACCOUNT_ADDRESS})
+        print(f"⛽ Gas estimado: {gas_estimate}")
+
         gas_price = web3.eth.gas_price
+        print(f"💰 Gas price: {gas_price}")
 
         tx_dict = function_call.build_transaction(
             {
@@ -110,11 +118,16 @@ def build_and_send_transaction(function_call):
                 "chainId": CHAIN_ID,
             }
         )
+        print(f"📄 Transacción construida: {tx_dict}")
 
         signed_tx = web3.eth.account.sign_transaction(tx_dict, PRIVATE_KEY)
-        tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        print(f"✍️ Transacción firmada")
+
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.raw_transaction)
+        print(f"📤 Transacción enviada: {tx_hash.hex()}")
 
         receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+        print(f"✅ Recibo obtenido: {receipt}")
 
         return {
             "transactionHash": tx_hash.hex(),
@@ -123,7 +136,9 @@ def build_and_send_transaction(function_call):
             "status": receipt["status"],
         }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"❌ Error en build_and_send_transaction: {str(e)}")
+        print(f"🔍 Tipo de error: {type(e).__name__}")
+        raise HTTPException(status_code=400, detail=f"Error en transacción: {str(e)}")
 
 
 # ==================== ENDPOINTS - 1. CREAR SERVICIO ====================
@@ -136,16 +151,23 @@ async def crear_servicio(request: CrearServicioRequest):
     - Retorna tokenId
     """
     try:
+        print(f"🎯 Iniciando creación de servicio para: {request.destinatario}")
         destinatario = Web3.to_checksum_address(request.destinatario)
+        print(f"✅ Dirección validada: {destinatario}")
+
         function = contract.functions.crearServicio(destinatario)
+        print(f"📋 Función del contrato preparada")
 
         tx_result = build_and_send_transaction(function)
+        print(f"✅ Transacción completada: {tx_result}")
 
         # Obtener tokenId del evento
         receipt = web3.eth.get_transaction_receipt(tx_result["transactionHash"])
         logs = contract.events.ServicioCreado().process_receipt(receipt)
+        print(f"📊 Logs del evento: {logs}")
 
         token_id = logs[0]["args"]["tokenId"] if logs else None
+        print(f"🎫 Token ID obtenido: {token_id}")
 
         return {
             "success": True,
@@ -155,7 +177,11 @@ async def crear_servicio(request: CrearServicioRequest):
             "transaction": tx_result,
         }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"❌ Error en crear_servicio: {str(e)}")
+        print(f"🔍 Tipo de error: {type(e).__name__}")
+        raise HTTPException(
+            status_code=400, detail=f"Error al crear servicio: {str(e)}"
+        )
 
 
 # ==================== ENDPOINTS - 2. CAMBIAR ESTADO ====================
@@ -307,14 +333,25 @@ async def obtener_servicios_usuario(usuarioAddress: str):
         usuario = Web3.to_checksum_address(usuarioAddress)
         balance = contract.functions.balanceOf(usuario).call()
 
+        # Obtener el próximo token ID para saber el rango máximo
+        next_token_id = contract.functions.obtenerProximoTokenId().call()
+
         servicios = []
-        for i in range(balance):
-            token_id = contract.functions.tokenOfOwnerByIndex(usuario, i).call()
-            servicios.append(token_id)
+        # Buscar todos los tokens que pertenecen al usuario
+        for token_id in range(next_token_id):
+            try:
+                owner = contract.functions.ownerOf(token_id).call()
+                if owner.lower() == usuario.lower():
+                    servicios.append(token_id)
+            except Exception:
+                # Si ownerOf falla, el token no existe o fue quemado
+                continue
 
         return {"usuario": usuario, "cantidad": balance, "servicios": servicios}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(
+            status_code=400, detail=f"Error al obtener servicios: {str(e)}"
+        )
 
 
 # ==================== ENDPOINTS ADICIONALES ====================

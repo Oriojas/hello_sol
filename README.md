@@ -3,12 +3,24 @@
 ## Descripción
 Contrato NFT ERC-721 que representa servicios de acompañamiento para adultos mayores. Cada NFT es un servicio individual con estados dinámicos y sistema de calificación.
 
+**🚀 Desplegado en: Arbitrum Sepolia**
+
+Este contrato es un MVP para una hackathon que permite crear, gestionar y calificar servicios de acompañamiento a través de NFTs con estados dinámicos.
+
 ## Estados del Servicio
 - **1 = CREADO**: Servicio registrado pero no iniciado
 - **2 = ENCONTRADO**: Profesional asignado al servicio  
 - **3 = TERMINADO**: Servicio completado
 - **4 = CALIFICADO**: Servicio evaluado con calificación 1-5
-- **5 = PAGADO**: Servicio pagado (crea NFT de evidencia para el acompañante)
+- **5 = PAGADO**: Servicio pagado (crea automáticamente un NFT de evidencia para el acompañante)
+
+## Características Principales
+- ✅ Sistema de estados progresivos para servicios
+- ✅ Calificación numérica 1-5 en estado CALIFICADO
+- ✅ Creación automática de NFT de evidencia al pagar
+- ✅ URIs dinámicas que cambian según el estado
+- ✅ Sin control de acceso (MVP para hackathon)
+- ✅ Compatible con Arbitrum Sepolia
 
 ## Funciones Principales
 
@@ -220,6 +232,23 @@ serviciosPorUsuario("0xUsuario3") // Debería retornar [2]
 - **NFT de evidencia**: Se crea automáticamente al marcar como PAGADO
 - **Compatibilidad OpenSea**: Metadatos estructurados según estándares
 
+## 🌐 Despliegue en Arbitrum Sepolia
+
+Para desplegar este contrato en Arbitrum Sepolia, consulta la guía completa en:
+**[DESPLEGAR_ARBITRUM_SEPOLIA.md](./DESPLEGAR_ARBITRUM_SEPOLIA.md)**
+
+### Requisitos Mínimos:
+- MetaMask configurado con Arbitrum Sepolia
+- ETH de prueba en Arbitrum Sepolia (desde [faucet](https://faucet.quicknode.com/arbitrum/sepolia))
+- Remix IDE o herramienta compatible con Solidity 0.8.20
+
+### Resumen de Despliegue:
+1. Compilar contrato en Remix (versión 0.8.20)
+2. Conectar MetaMask a Arbitrum Sepolia
+3. Desplegar contrato (sin parámetros)
+4. Confirmar transacción en MetaMask
+5. Guardar dirección del contrato para futuras interacciones
+
 ## Próximos Pasos para Producción
 
 1. Implementar control de acceso con roles específicos
@@ -227,3 +256,5 @@ serviciosPorUsuario("0xUsuario3") // Debería retornar [2]
 3. Implementar eventos ERC-4906 para actualizaciones de metadatos
 4. Agregar más validaciones y restricciones de estado
 5. Implementar sistema de reembolsos o disputas
+6. Auditoria de seguridad del contrato
+7. Documentación completa de API

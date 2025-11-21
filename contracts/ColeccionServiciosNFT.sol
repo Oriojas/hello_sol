@@ -15,17 +15,11 @@ contract ColeccionServiciosNFT is
     ERC721Burnable,
     Ownable
 {
-    // Estados posibles para cada servicio
-    enum ServiceState {
-        CREADO,
-        ENCONTRADO,
-        TERMINADO,
-        CALIFICADO,
-        PAGADO
-    }
+    // Estados posibles para cada servicio (enteros 1-5)
+    // 1 = CREADO, 2 = ENCONTRADO, 3 = TERMINADO, 4 = CALIFICADO, 5 = PAGADO
 
-    // Mapeo de tokenId a estado actual del servicio
-    mapping(uint256 => ServiceState) public estadosServicios;
+    // Mapeo de tokenId a estado actual del servicio (1-5)
+    mapping(uint256 => uint8) public estadosServicios;
 
     // Mapeo de tokenId a calificación (1-5)
     mapping(uint256 => uint8) public calificacionesServicios;
@@ -37,7 +31,7 @@ contract ColeccionServiciosNFT is
     mapping(uint256 => uint256) public evidenciasServicios;
 
     // Mapeo de URIs por estado (configuración global)
-    mapping(ServiceState => string) public URIsPorEstado;
+    mapping(uint8 => string) public URIsPorEstado;
 
     // Contador de servicios en la colección
     uint256 private _nextTokenId;
@@ -46,11 +40,11 @@ contract ColeccionServiciosNFT is
     event ServicioCreado(uint256 indexed tokenId, address indexed destinatario);
     event EstadoCambiado(
         uint256 indexed tokenId,
-        ServiceState estadoAnterior,
-        ServiceState nuevoEstado,
+        uint8 estadoAnterior,
+        uint8 nuevoEstado,
         uint8 calificacion
     );
-    event URIEstadoConfigurada(ServiceState estado, string nuevaURI);
+    event URIEstadoConfigurada(uint8 estado, string nuevaURI);
     event ServicioPagado(
         uint256 indexed tokenId,
         address indexed acompanante,
@@ -66,19 +60,17 @@ contract ColeccionServiciosNFT is
      * @param destinatario Dirección que recibirá el NFT del servicio
      * @return tokenId del nuevo servicio creado
      */
-    function crearServicio(
-        address destinatario
-    ) public onlyOwner returns (uint256) {
+    function crearServicio(address destinatario) public returns (uint256) {
         uint256 tokenId = _nextTokenId++;
         _safeMint(destinatario, tokenId);
 
-        // Estado inicial: CREADO
-        estadosServicios[tokenId] = ServiceState.CREADO;
+        // Estado inicial: CREADO (1)
+        estadosServicios[tokenId] = 1;
         calificacionesServicios[tokenId] = 0;
         acompanantesServicios[tokenId] = address(0);
 
         // Asignar URI inicial basada en el estado
-        _setTokenURI(tokenId, URIsPorEstado[ServiceState.CREADO]);
+        _setTokenURI(tokenId, URIsPorEstado[1]);
 
         emit ServicioCreado(tokenId, destinatario);
         return tokenId;
@@ -92,16 +84,18 @@ contract ColeccionServiciosNFT is
      */
     function cambiarEstadoServicio(
         uint256 tokenId,
-        ServiceState nuevoEstado,
+        uint8 nuevoEstado,
         uint8 calificacion
-    ) public onlyOwner {
+    ) public {
         require(ownerOf(tokenId) != address(0), "Servicio no existe");
+        require(nuevoEstado >= 1 && nuevoEstado <= 5, "Estado invalido");
 
-        ServiceState estadoAnterior = estadosServicios[tokenId];
+        uint8 estadoAnterior = estadosServicios[tokenId];
         estadosServicios[tokenId] = nuevoEstado;
 
         // Validar y asignar calificación
-        if (nuevoEstado == ServiceState.CALIFICADO) {
+        if (nuevoEstado == 4) {
+            // CALIFICADO
             require(
                 calificacion >= 1 && calificacion <= 5,
                 "Calificacion debe ser entre 1 y 5"
@@ -112,9 +106,10 @@ contract ColeccionServiciosNFT is
         }
 
         // Si es estado PAGADO, crear NFT de evidencia para el acompañante
-        if (nuevoEstado == ServiceState.PAGADO) {
+        if (nuevoEstado == 5) {
+            // PAGADO
             require(
-                estadoAnterior == ServiceState.CALIFICADO,
+                estadoAnterior == 4, // CALIFICADO
                 "Servicio debe estar calificado para pagar"
             );
             address acompanante = acompanantesServicios[tokenId];
@@ -124,15 +119,15 @@ contract ColeccionServiciosNFT is
             uint256 tokenIdEvidencia = _nextTokenId++;
             _safeMint(acompanante, tokenIdEvidencia);
 
-            // Estado inicial de la evidencia: PAGADO
-            estadosServicios[tokenIdEvidencia] = ServiceState.PAGADO;
+            // Estado inicial de la evidencia: PAGADO (5)
+            estadosServicios[tokenIdEvidencia] = 5;
             calificacionesServicios[tokenIdEvidencia] = calificacionesServicios[
                 tokenId
             ];
             acompanantesServicios[tokenIdEvidencia] = acompanante;
 
             // Asignar URI de evidencia pagada
-            _setTokenURI(tokenIdEvidencia, URIsPorEstado[ServiceState.PAGADO]);
+            _setTokenURI(tokenIdEvidencia, URIsPorEstado[5]);
 
             // Registrar relación entre token original y evidencia
             evidenciasServicios[tokenId] = tokenIdEvidencia;
@@ -151,10 +146,8 @@ contract ColeccionServiciosNFT is
      * @param estado Estado para el cual configurar la URI
      * @param nuevaURI Nueva URI para el estado
      */
-    function configurarURIEstado(
-        ServiceState estado,
-        string memory nuevaURI
-    ) public onlyOwner {
+    function configurarURIEstado(uint8 estado, string memory nuevaURI) public {
+        require(estado >= 1 && estado <= 5, "Estado invalido");
         URIsPorEstado[estado] = nuevaURI;
         emit URIEstadoConfigurada(estado, nuevaURI);
     }
@@ -166,7 +159,7 @@ contract ColeccionServiciosNFT is
      */
     function obtenerEstadoServicio(
         uint256 tokenId
-    ) public view returns (ServiceState) {
+    ) public view returns (uint8) {
         require(ownerOf(tokenId) != address(0), "Servicio no existe");
         return estadosServicios[tokenId];
     }
@@ -188,10 +181,7 @@ contract ColeccionServiciosNFT is
      * @param tokenId ID del servicio
      * @param acompanante Dirección del acompañante
      */
-    function asignarAcompanante(
-        uint256 tokenId,
-        address acompanante
-    ) public onlyOwner {
+    function asignarAcompanante(uint256 tokenId, address acompanante) public {
         require(ownerOf(tokenId) != address(0), "Servicio no existe");
         require(acompanante != address(0), "Acompanante no valido");
         acompanantesServicios[tokenId] = acompanante;
@@ -223,15 +213,15 @@ contract ColeccionServiciosNFT is
      * @dev Función específica para marcar servicio como pagado
      * @param tokenId ID del servicio a marcar como pagado
      */
-    function marcarComoPagado(uint256 tokenId) public onlyOwner {
+    function marcarComoPagado(uint256 tokenId) public {
         require(ownerOf(tokenId) != address(0), "Servicio no existe");
         require(
-            estadosServicios[tokenId] == ServiceState.CALIFICADO,
+            estadosServicios[tokenId] == 4, // CALIFICADO
             "Servicio debe estar calificado"
         );
 
-        ServiceState estadoAnterior = estadosServicios[tokenId];
-        estadosServicios[tokenId] = ServiceState.PAGADO;
+        uint8 estadoAnterior = estadosServicios[tokenId];
+        estadosServicios[tokenId] = 5; // PAGADO
 
         address acompanante = acompanantesServicios[tokenId];
         require(acompanante != address(0), "Acompanante no asignado");
@@ -240,15 +230,15 @@ contract ColeccionServiciosNFT is
         uint256 tokenIdEvidencia = _nextTokenId++;
         _safeMint(acompanante, tokenIdEvidencia);
 
-        // Estado inicial de la evidencia: PAGADO
-        estadosServicios[tokenIdEvidencia] = ServiceState.PAGADO;
+        // Estado inicial de la evidencia: PAGADO (5)
+        estadosServicios[tokenIdEvidencia] = 5;
         calificacionesServicios[tokenIdEvidencia] = calificacionesServicios[
             tokenId
         ];
         acompanantesServicios[tokenIdEvidencia] = acompanante;
 
         // Asignar URI de evidencia pagada
-        _setTokenURI(tokenIdEvidencia, URIsPorEstado[ServiceState.PAGADO]);
+        _setTokenURI(tokenIdEvidencia, URIsPorEstado[5]);
 
         // Registrar relación entre token original y evidencia
         evidenciasServicios[tokenId] = tokenIdEvidencia;
@@ -256,7 +246,7 @@ contract ColeccionServiciosNFT is
         emit EstadoCambiado(
             tokenId,
             estadoAnterior,
-            ServiceState.PAGADO,
+            5, // PAGADO
             calificacionesServicios[tokenId]
         );
         emit ServicioPagado(tokenId, acompanante, tokenIdEvidencia);

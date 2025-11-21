@@ -17,7 +17,7 @@
 
 1. **Ve a la pestaña "Solidity Compiler"** (icono del martillo)
 2. **Configura los parámetros:**
-   - Compiler Version: `0.8.20`
+   - Compiler Version: `0.8.19`
    - Language: `Solidity`
    - EVM Version: `default`
 
@@ -34,7 +34,8 @@
    - **Gas limit:** Deja el valor por defecto
 
 3. **Datos para desplegar:**
-   - El contrato NO requiere parámetros en el constructor
+   - El constructor inicializa automáticamente con msg.sender como owner
+   - No requiere parámetros adicionales
    - Solo haz clic en **"Deploy"**
 
 4. **Espera a que se complete** (debería ser inmediato)

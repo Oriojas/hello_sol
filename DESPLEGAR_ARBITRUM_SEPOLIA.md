@@ -47,7 +47,7 @@ Explorador de bloques: https://sepolia.arbiscan.io/
 ### 2.2 Compilar el Contrato
 
 1. Ve a la pestaña **"Solidity Compiler"** (icono del martillo)
-2. Asegúrate de que la versión sea **0.8.20**
+2. Asegúrate de que la versión sea **0.8.19**
 3. Haz clic en **"Compile ColeccionServiciosNFT.sol"**
 4. Espera a que termine la compilación (sin errores)
 

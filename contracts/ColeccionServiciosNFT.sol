@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.19;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC721URIStorage} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ColeccionServiciosNFT is ERC721, ERC721URIStorage {
+contract ColeccionServiciosNFT is ERC721, ERC721URIStorage, Ownable {
     // Estados posibles para cada servicio (enteros 1-5)
     // 1 = CREADO, 2 = ENCONTRADO, 3 = TERMINADO, 4 = CALIFICADO, 5 = PAGADO
 
@@ -41,7 +42,7 @@ contract ColeccionServiciosNFT is ERC721, ERC721URIStorage {
         uint256 indexed tokenIdEvidencia
     );
 
-    constructor() ERC721("ColeccionServiciosNFT", "CSNFT") {
+    constructor() ERC721("ColeccionServiciosNFT", "CSNFT") Ownable(msg.sender) {
         _nextTokenId = 0;
     }
 
@@ -81,7 +82,8 @@ contract ColeccionServiciosNFT is ERC721, ERC721URIStorage {
         uint8 nuevoEstado,
         uint8 calificacion
     ) public {
-        require(_ownerOf(tokenId) != address(0), "Servicio no existe");
+        address tokenOwner = _ownerOf(tokenId);
+        require(tokenOwner != address(0), "Servicio no existe");
         require(nuevoEstado >= 1 && nuevoEstado <= 5, "Estado invalido");
 
         uint8 estadoAnterior = estadosServicios[tokenId];
@@ -299,5 +301,10 @@ contract ColeccionServiciosNFT is ERC721, ERC721URIStorage {
         uint128 value
     ) internal override(ERC721) {
         super._increaseBalance(account, value);
+    }
+
+    function burn(uint256 tokenId) public {
+        require(_ownerOf(tokenId) == msg.sender, "No eres el propietario");
+        _burn(tokenId);
     }
 }

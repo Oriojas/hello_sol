@@ -1,11 +1,13 @@
 import json
 import os
-from typing import List
+from pathlib import Path
 
 from dotenv import load_dotenv
+from eth_account import Account
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from transaction_logger import log_transaction
 from web3 import Web3
 
 load_dotenv()
@@ -129,12 +131,14 @@ def build_and_send_transaction(function_call):
         receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
         print(f"✅ Recibo obtenido: {receipt}")
 
-        return {
+        tx_result = {
             "transactionHash": tx_hash.hex(),
             "blockNumber": receipt["blockNumber"],
             "gasUsed": receipt["gasUsed"],
             "status": receipt["status"],
         }
+
+        return tx_result
     except Exception as e:
         print(f"❌ Error en build_and_send_transaction: {str(e)}")
         print(f"🔍 Tipo de error: {type(e).__name__}")
@@ -168,6 +172,15 @@ async def crear_servicio(request: CrearServicioRequest):
 
         token_id = logs[0]["args"]["tokenId"] if logs else None
         print(f"🎫 Token ID obtenido: {token_id}")
+
+        # Registrar transacción en el log
+        log_transaction(
+            tx_hash=tx_result["transactionHash"],
+            function_name="crearServicio",
+            parameters={"destinatario": destinatario},
+            result={"tokenId": token_id, "estado": 1, **tx_result},
+            status="success" if tx_result["status"] == 1 else "failed",
+        )
 
         return {
             "success": True,
@@ -212,6 +225,23 @@ async def cambiar_estado_servicio(tokenId: int, request: CambiarEstadoRequest):
 
         estado_anterior = logs[0]["args"]["estadoAnterior"] if logs else None
 
+        # Registrar transacción en el log
+        log_transaction(
+            tx_hash=tx_result["transactionHash"],
+            function_name="cambiarEstadoServicio",
+            parameters={
+                "tokenId": tokenId,
+                "nuevoEstado": request.nuevoEstado,
+                "calificacion": request.calificacion,
+            },
+            result={
+                "estadoAnterior": estado_anterior,
+                "nuevoEstado": request.nuevoEstado,
+                **tx_result,
+            },
+            status="success" if tx_result["status"] == 1 else "failed",
+        )
+
         return {
             "success": True,
             "tokenId": tokenId,
@@ -241,6 +271,15 @@ async def configurar_uri_estado(request: ConfigurarURIRequest):
         )
 
         tx_result = build_and_send_transaction(function)
+
+        # Registrar transacción en el log
+        log_transaction(
+            tx_hash=tx_result["transactionHash"],
+            function_name="configurarURIEstado",
+            parameters={"estado": request.estado, "nuevaURI": request.nuevaURI},
+            result={"estado": request.estado, **tx_result},
+            status="success" if tx_result["status"] == 1 else "failed",
+        )
 
         return {
             "success": True,
@@ -366,6 +405,15 @@ async def asignar_acompanante(tokenId: int, request: AsignarAcompananteRequest):
 
         tx_result = build_and_send_transaction(function)
 
+        # Registrar transacción en el log
+        log_transaction(
+            tx_hash=tx_result["transactionHash"],
+            function_name="asignarAcompanante",
+            parameters={"tokenId": tokenId, "acompanante": acompanante},
+            result={"tokenId": tokenId, **tx_result},
+            status="success" if tx_result["status"] == 1 else "failed",
+        )
+
         return {
             "success": True,
             "tokenId": tokenId,
@@ -390,6 +438,19 @@ async def marcar_como_pagado(tokenId: int):
         logs = contract.events.ServicioPagado().process_receipt(receipt)
 
         token_id_evidencia = logs[0]["args"]["tokenIdEvidencia"] if logs else None
+
+        # Registrar transacción en el log
+        log_transaction(
+            tx_hash=tx_result["transactionHash"],
+            function_name="marcarComoPagado",
+            parameters={"tokenId": tokenId},
+            result={
+                "tokenId": tokenId,
+                "tokenIdEvidencia": token_id_evidencia,
+                **tx_result,
+            },
+            status="success" if tx_result["status"] == 1 else "failed",
+        )
 
         return {
             "success": True,
@@ -458,6 +519,57 @@ async def health_check():
         }
     except Exception as e:
         return {"status": "error", "detail": str(e)}
+
+
+# ==================== ENDPOINTS DE LOGS ====================
+@app.get("/logs/transacciones")
+async def obtener_logs_transacciones(limit: int = 50):
+    """
+    Obtener el historial de transacciones registradas
+    """
+    try:
+        from transaction_logger import get_transaction_history
+
+        transactions = get_transaction_history(limit)
+        return {"total": len(transactions), "transactions": transactions}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error obteniendo logs: {str(e)}")
+
+
+@app.get("/logs/estadisticas")
+async def obtener_estadisticas_logs():
+    """
+    Obtener estadísticas de las transacciones registradas
+    """
+    try:
+        from transaction_logger import get_statistics
+
+        stats = get_statistics()
+        return stats
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error obteniendo estadísticas: {str(e)}"
+        )
+
+
+@app.get("/logs/transaccion/{tx_hash}")
+async def obtener_transaccion_por_hash(tx_hash: str):
+    """
+    Buscar una transacción específica por su hash
+    """
+    try:
+        from transaction_logger import transaction_logger
+
+        transaction = transaction_logger.get_transaction_by_hash(tx_hash)
+        if not transaction:
+            raise HTTPException(status_code=404, detail="Transacción no encontrada")
+        return transaction
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error buscando transacción: {str(e)}"
+        )
 
 
 if __name__ == "__main__":

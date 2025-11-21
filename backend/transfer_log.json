@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "created_at": "2025-11-21T18:02:59.634901",
+    "description": "Registro de transacciones NFT Servicios",
+    "network": "Arbitrum Sepolia",
+    "contract_address": "0xFF2E077849546cCB392f9e38B716A40fDC451798",
+    "version": "1.0.0",
+    "last_updated": "2025-11-21T18:03:31.905127",
+    "total_transactions": 2
+  },
+  "transactions": [
+    {
+      "timestamp": "2025-11-21T18:03:31.904657",
+      "transaction_hash": "edf69ca139d865e0eb9d9c9e6c742bef02927fa4ff6ce33ed681832351951f17",
+      "arbiscan_url": "https://sepolia.arbiscan.io/tx/edf69ca139d865e0eb9d9c9e6c742bef02927fa4ff6ce33ed681832351951f17",
+      "function": "cambiarEstadoServicio",
+      "parameters": {
+        "tokenId": 3,
+        "nuevoEstado": 2,
+        "calificacion": 0
+      },
+      "result": {
+        "estadoAnterior": 1,
+        "nuevoEstado": 2,
+        "transactionHash": "edf69ca139d865e0eb9d9c9e6c742bef02927fa4ff6ce33ed681832351951f17",
+        "blockNumber": 217621516,
+        "gasUsed": 36070,
+        "status": 1
+      },
+      "status": "success",
+      "block_number": 217621516,
+      "gas_used": 36070,
+      "network": "arbitrumSepolia"
+    },
+    {
+      "timestamp": "2025-11-21T18:03:09.511162",
+      "transaction_hash": "f7ac30bbb621be2e131d1627a109597286980a32a747353980a7a0907f0ec59a",
+      "arbiscan_url": "https://sepolia.arbiscan.io/tx/f7ac30bbb621be2e131d1627a109597286980a32a747353980a7a0907f0ec59a",
+      "function": "crearServicio",
+      "parameters": {
+        "destinatario": "0xa92d504731aA3E99DF20ffd200ED03F9a55a6219"
+      },
+      "result": {
+        "tokenId": 3,
+        "estado": 1,
+        "transactionHash": "f7ac30bbb621be2e131d1627a109597286980a32a747353980a7a0907f0ec59a",
+        "blockNumber": 217621429,
+        "gasUsed": 87663,
+        "status": 1
+      },
+      "status": "success",
+      "block_number": 217621429,
+      "gas_used": 87663,
+      "network": "arbitrumSepolia"
+    }
+  ]
+}

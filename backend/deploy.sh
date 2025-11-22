@@ -37,6 +37,10 @@ pip install --upgrade pip
 echo "📚 Instalando dependencias..."
 pip install -r requirements.txt
 
+# Instalar setuptools (necesario para web3)
+echo "📦 Instalando setuptools..."
+pip install setuptools
+
 # Verificar instalación
 echo "✅ Verificando instalación..."
 python -c "import fastapi, web3, uvicorn; print('✅ Dependencias cargadas correctamente')"

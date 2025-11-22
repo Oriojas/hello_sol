@@ -1,15 +1,46 @@
 import json
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
-from web3 import Web3
 
 
 def diagnostic_check():
     """Script de diagnóstico para verificar la configuración del backend"""
     print("🔍 INICIANDO DIAGNÓSTICO DEL BACKEND")
     print("=" * 50)
+
+    # 0. Verificar dependencias básicas
+    print("\n📦 0. VERIFICANDO DEPENDENCIAS BÁSICAS")
+    print("-" * 30)
+
+    try:
+        import pkg_resources
+
+        print("✅ pkg_resources disponible")
+    except ImportError:
+        print("❌ pkg_resources no disponible - instalando setuptools...")
+        try:
+            import subprocess
+
+            subprocess.check_call(
+                [sys.executable, "-m", "pip", "install", "setuptools"]
+            )
+            import pkg_resources
+
+            print("✅ setuptools instalado correctamente")
+        except Exception as e:
+            print(f"❌ Error instalando setuptools: {e}")
+            return False
+
+    try:
+        from web3 import Web3
+
+        print("✅ Web3 disponible")
+    except ImportError as e:
+        print(f"❌ Web3 no disponible: {e}")
+        return False
 
     # 1. Verificar variables de entorno
     print("\n📋 1. VERIFICANDO VARIABLES DE ENTORNO")
@@ -132,8 +163,8 @@ def diagnostic_check():
         print(f"❌ Error interactuando con el contrato: {e}")
         return False
 
-    # 6. Verificar dependencias
-    print("\n📦 6. VERIFICANDO DEPENDENCIAS")
+    # 6. Verificar dependencias completas
+    print("\n📦 6. VERIFICANDO DEPENDENCIAS COMPLETAS")
     print("-" * 30)
 
     try:
@@ -141,17 +172,22 @@ def diagnostic_check():
         import fastapi
         import pydantic
         import uvicorn
+        import web3
 
         print(f"✅ FastAPI: {fastapi.__version__}")
         print(f"✅ Uvicorn: {uvicorn.__version__}")
         print(f"✅ Pydantic: {pydantic.__version__}")
         print(f"✅ Web3: {web3.__version__}")
         print(f"✅ eth-account: {eth_account.__version__}")
+        print(f"✅ setuptools: {pkg_resources.get_distribution('setuptools').version}")
 
     except ImportError as e:
         print(f"❌ Dependencia faltante: {e}")
         print("💡 Ejecuta: pip install -r requirements.txt")
         return False
+    except Exception as e:
+        print(f"⚠️  Advertencia en verificación de versiones: {e}")
+        # Continuar aunque haya problemas con versiones
 
     # Resumen final
     print("\n" + "=" * 50)
@@ -168,6 +204,12 @@ def test_transaction():
     """Probar una transacción simple"""
     print("\n🧪 PROBANDO TRANSACCIÓN")
     print("-" * 30)
+
+    try:
+        from web3 import Web3
+    except ImportError:
+        print("❌ Web3 no disponible")
+        return
 
     load_dotenv()
     w3 = Web3(

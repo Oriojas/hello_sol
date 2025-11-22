@@ -1,5 +1,30 @@
 # NFT Servicios Backend - FastAPI
 
+## 🧪 Suite de Pruebas Automatizadas
+
+Se ha implementado una suite completa de pruebas automatizadas para verificar todos los endpoints del backend. Las pruebas están ubicadas en la carpeta `tests/`.
+
+### Ejecutar Pruebas Completas
+```bash
+cd tests
+python3 test_backend_completo.py
+```
+
+**Características de las pruebas:**
+- ✅ Prueba todos los 17 endpoints documentados
+- ✅ Flujo completo de creación y gestión de un servicio
+- ✅ Manejo de errores y validaciones
+- ✅ Logging detallado en tiempo real
+- ✅ Generación de reporte JSON con resultados
+- ✅ Compatible con Arbitrum Sepolia
+
+**Resultados esperados:**
+- 19 pruebas ejecutadas en secuencia lógica
+- Tiempo estimado: 2-5 minutos
+- Genera archivo `test_results_YYYYMMDD_HHMMSS.json` con resultados detallados
+
+Para más información, consulta `tests/README.md`.
+
 Backend REST para gestionar NFTs de servicios de acompañamiento a adultos mayores en Arbitrum Sepolia. Todas las transacciones se ejecutan automáticamente con la clave privada configurada.
 
 ## 🚀 Setup Rápido
@@ -533,3 +558,41 @@ curl "http://localhost:8000/logs/estadisticas"
 ---
 
 **Versión:** 2.0.0 | **Red:** Arbitrum Sepolia | **Status:** Production Ready ✅
+
+---
+
+## ✅ Estado de Pruebas
+
+**Pruebas Automatizadas Completadas Exitosamente**
+- **Fecha de última ejecución:** 21 de Noviembre 2025
+- **Total de pruebas:** 19/19 exitosas (100%)
+- **Flujo completo verificado:** Creación → Asignación → Estados → Pago → Evidencia
+- **Token IDs generados:** Servicio #11, Evidencia #12
+- **Transacciones confirmadas:** Todas en Arbitrum Sepolia
+
+**Endpoints Verificados:**
+1. ✅ `/health` - Health check del sistema
+2. ✅ `/info/contrato` - Información del contrato  
+3. ✅ `/info/cuenta` - Información de la cuenta ejecutora
+4. ✅ `/configuracion/uri-estado` - Configuración de URIs
+5. ✅ `/servicios/crear` - Creación de nuevo servicio
+6. ✅ `/servicios/{tokenId}/estado` - Consulta de estado
+7. ✅ `/servicios/{tokenId}/uri` - Consulta de URI
+8. ✅ `/servicios/{tokenId}/asignar-acompanante` - Asignación de acompañante
+9. ✅ `/servicios/{tokenId}/acompanante` - Consulta de acompañante
+10. ✅ `/servicios/{tokenId}/cambiar-estado` - Cambio de estado progresivo
+11. ✅ `/servicios/{tokenId}/calificacion` - Consulta de calificación
+12. ✅ `/servicios/{tokenId}/marcar-pagado` - Marcar como pagado
+13. ✅ `/servicios/{tokenId}/evidencia` - Consulta de evidencia
+14. ✅ `/servicios/usuario/{address}` - Servicios por usuario
+15. ✅ `/logs/transacciones` - Logs de transacciones
+16. ✅ `/logs/estadisticas` - Estadísticas de logs
+
+**Flujo Completo Verificado:**
+1. **CREADO** (estado 1) → Servicio creado exitosamente
+2. **ENCONTRADO** (estado 2) → Acompañante asignado correctamente
+3. **TERMINADO** (estado 3) → Servicio completado
+4. **CALIFICADO** (estado 4) → Calificación aplicada (1-5)
+5. **PAGADO** (estado 5) → NFT de evidencia creado automáticamente
+
+**Nota:** Las pruebas ejecutan transacciones reales que gastan gas. Se requiere ETH suficiente en Arbitrum Sepolia para completar todas las pruebas.
